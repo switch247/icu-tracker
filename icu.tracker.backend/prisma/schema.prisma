@@ -1,0 +1,82 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb" // or your preferred database
+  url      = env("DATABASE_URL")
+}
+
+enum Role {
+  SUPER_ADMIN
+  HOSPITAL_ADMIN
+  USER
+}
+
+enum HospitalType {
+  PUBLIC
+  PRIVATE
+  GOVERNMENT
+}
+
+enum HospitalLevel {
+  PRIMARY
+  GENERAL
+  TERTIARY
+}
+
+model User {
+  id         String    @id @default(uuid()) @map("_id")
+  name       String
+  email      String    @unique
+  password   String
+  phoneNumber String?   @map("phone_number")
+  isVerified Boolean   @default(false) @map("is_verified")
+  role       Role
+  hospitalId String?   @map("hospital_id")
+  hospital   Hospital? @relation(fields: [hospitalId], references: [id])
+  createdAt  DateTime  @default(now()) @map("created_at")
+  updatedAt  DateTime  @updatedAt @map("updated_at")
+  deletedAt  DateTime? @map("deleted_at") // For soft deletion
+}
+
+model Hospital {
+  id                        String        @id @default(uuid()) @map("_id")
+  name                      String
+  address                   String
+  region                    String // Region where the hospital is located
+  zone                      String? // Zone where the hospital is located
+  latitude                  Float? // Latitude of the hospital's location
+  longitude                 Float? // Longitude of the hospital's location
+  type                      HospitalType // PUBLIC or PRIVATE
+  level                     HospitalLevel // PRIMARY, GENERAL, or TERTIARY
+  bedCapacity               Int           @map("bed_capacity") // Total beds (including non-ICU)
+  icuBeds                   Int           @map("icu_beds") // Total ICU beds
+  availableIcuBeds          Int           @map("available_icu_beds") // Current available ICU beds
+  nonFunctionalBeds         Int           @map("non_functional_beds") // Beds that are not functional
+  advancedAmbulanceServices Boolean       @map("advanced_ambulance_services") // Whether advanced ambulance services exist
+  members                   User[] // Users linked to this hospital
+  icuHistories              IcuHistory[] // Icu tracking history
+  createdAt                 DateTime      @default(now()) @map("created_at")
+  updatedAt                 DateTime      @updatedAt @map("updated_at")
+  deletedAt                 DateTime?     @map("deleted_at") // For soft deletion
+}
+
+model IcuHistory {
+  id                String    @id @default(uuid()) @map("_id")
+  hospitalId        String    @map("hospital_id")
+  hospital          Hospital  @relation(fields: [hospitalId], references: [id])
+  date              DateTime // Date of the log
+  totalBeds         Int       @map("total_beds")
+  icuBeds           Int       @map("icu_beds")
+  availableIcuBeds  Int       @map("available_icu_beds")
+  nonFunctionalBeds Int       @map("non_functional_beds")
+  createdAt         DateTime  @default(now()) @map("created_at")
+  deletedAt         DateTime? @map("deleted_at") // For soft deletion
+}
