@@ -1,7 +1,7 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
-  distDir: 'build',
+  // distDir: 'build',
 };
-module.exports = nextConfig;
-// export default nextConfig;
+// module.exports = nextConfig;
+export default nextConfig;
