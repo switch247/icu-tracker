@@ -3,5 +3,5 @@ const nextConfig = {
   pageExtensions: ['tsx', 'ts', 'jsx', 'js'],
   distDir: 'build',
 };
-
-export default nextConfig;
+module.exports = nextConfig;
+// export default nextConfig;
