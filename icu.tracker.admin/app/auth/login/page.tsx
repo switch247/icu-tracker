@@ -15,10 +15,12 @@ export default function LoginPage() {
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [error, setError] = useState('')
+  const [loading, setLoading] = useState(false)
   const router = useRouter()
   const { login: authLogin } = useAuth()
 
   const handleSubmit = async (e: React.FormEvent) => {
+    setLoading(true)
     e.preventDefault()
     setError('')
     try {
@@ -37,6 +39,8 @@ export default function LoginPage() {
     } catch (err) {
       console.log(err)
       setError('An error occurred. Please try again.')
+    }finally    {
+      setLoading(false)
     }
   }
 
@@ -72,7 +76,7 @@ export default function LoginPage() {
             </div>
           </CardContent>
           <CardFooter className="flex flex-col space-y-4">
-            <Button type="submit" className="w-full">Sign in</Button>
+            <Button type="submit" className="w-full" disabled={loading}>Sign in</Button>
             <p className="text-sm text-center text-gray-600">
               {"Don't have an account? "}
               <Link href="/auth/register" className="text-primary hover:underline">
