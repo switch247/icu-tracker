@@ -1,0 +1,41 @@
+{
+  "name": "icu.tracker.backend",
+  "version": "1.0.0",
+  "description": "baceknd for icu tracker",
+  "main": "index.js",
+  "scripts": {
+    "heroku-prebuild": "export NPM_CONFIG_PRODUCTION=false; export NODE_ENV=; NPM_CONFIG_PRODUCTION=false NODE_ENV=development npm install --only=dev --dev",
+    "heroku-postbuild": "export NPM_CONFIG_PRODUCTION=true; export NODE_ENV=production;",
+    "dev": "nodemon index.js",
+    "start": "node index.js",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "engines": {
+    "node": "22.x"
+  },
+  "keywords": [
+    "node",
+    "baceknd",
+    "icu-tracker",
+    "prisma",
+    "cronjobs"
+  ],
+  "author": "Abel Bekele",
+  "license": "ISC",
+  "dependencies": {
+    "@prisma/client": "5.22.0",
+    "cors": "^2.8.5",
+    "date-fns": "^4.1.0",
+    "jsonwebtoken": "^9.0.2",
+    "module-alias": "^2.2.3",
+    "nodemon": "^3.1.7",
+    "xlsx": "^0.18.5"
+  },
+  "devDependencies": {
+    "prisma": "5.22.0",
+    "ts-node": "^10.9.2"
+  },
+  "_moduleAliases": {
+    "@base": "./"
+  }
+}
