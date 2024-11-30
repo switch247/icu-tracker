@@ -1,4 +1,5 @@
 
+"use client"
 import EthiopiaHospitalsMap from "../../components/EthiopiaHospitalsMap";
 
 
