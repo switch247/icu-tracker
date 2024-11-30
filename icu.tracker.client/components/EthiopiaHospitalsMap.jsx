@@ -1,4 +1,4 @@
-'use client';
+"use client";
 
 import React, { useState, useEffect } from 'react';
 import {
@@ -11,6 +11,9 @@ import {
   GeoJSON,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
+import "leaflet-defaulticon-compatibility"
+import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
+
 import L from 'leaflet';
 import regionsGeoJson from './regionsGeoJson.json';
 import zonesGeoJson from './zonesGeoJson.json';
@@ -57,7 +60,7 @@ const EthiopiaHospitalsMap = () => {
   const [geoJsonData, setGeoJsonData] = useState(null);
   const [zoneGeoJsonData, setZoneGeoJsonData] = useState(null);
   const [selectedRegion, setSelectedRegion] = useState(null);
-
+  const [isMounted, setIsMounted] = React.useState(false);
   const onEachFeature = (feature, layer) => {
     layer.on({
       click: () => {
@@ -111,12 +114,9 @@ const EthiopiaHospitalsMap = () => {
     );
   };
   useEffect(() => {
-    // Ensure this code runs only on the client side
-    if (typeof window !== 'undefined') {
-      // Load your GeoJSON data here
+    setIsMounted(true);
       setGeoJsonData(regionsGeoJson);
-      //   setZoneGeoJsonData(zonesGeoJson);
-    }
+     
   }, []);
 
   // Fetch hospitals data from the backend API
@@ -154,10 +154,12 @@ const EthiopiaHospitalsMap = () => {
     );
     setFilteredHospitals(filtered);
   };
+  useEffect (() => {
   // Ensure the map is only rendered on the client side
   if (typeof window === 'undefined') {
     return null;
   }
+  },[]);
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
@@ -186,7 +188,7 @@ const EthiopiaHospitalsMap = () => {
           >
             <strong>Error:</strong> {error}
           </div>
-        ) : (
+        ) : isMounted? (
           <MapContainer
             center={[9.03, 38.74]}
             zoom={6.2}
@@ -274,7 +276,7 @@ const EthiopiaHospitalsMap = () => {
               />
             )}
           </MapContainer>
-        )}
+        ): null}
 
         {/* Legend Footer */}
         {LegendFooter()}
