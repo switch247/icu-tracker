@@ -36,7 +36,7 @@ export default function HomePage() {
         </>
 
         )}
-        {user && (user.role == "HOSPITAL_ADMIN") && (<Link href="/my-hospital">
+        {user && (user.role != "SUPER_ADMIN") && (<Link href="/my-hospital">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>My Hospital</CardTitle>
