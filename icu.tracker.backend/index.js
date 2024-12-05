@@ -43,9 +43,6 @@ app.get("/", async (req, res) => {
     res.status(500).send(`Database connection failed: ${error.message}`);
   }
 });
-app.get('/', (req, res) => {
-  res.status(200).send('Server is up and running!');
-});
 // Graceful shutdown
 process.on("SIGINT", async () => {
   await prisma.$disconnect();

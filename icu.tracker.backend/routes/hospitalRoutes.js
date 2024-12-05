@@ -6,7 +6,7 @@ const router = express.Router();
 router.get('/', hospitalController.getAllHospitals);
 router.get('/:id', hospitalController.getHospitalById);
 router.post('/',authController.verifyToken, hospitalController.createHospital);
-router.put('/:id',authController.verifyToken, hospitalController.updateHospital);
+router.put('/:id', hospitalController.updateHospital);
 router.delete('/:id',authController.verifyToken, hospitalController.deleteHospital);
 router.get('/:id/history', hospitalController.getHospitalHistory);
 

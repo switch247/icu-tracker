@@ -13,7 +13,25 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
+enum Region {
+  ADDIS_ABABA
+  AFAR
+  AMHARA
+  BENISHANGUL_GUMUZ
+  CENTRAL_ETHIOPIA
+  DIRE_DAWA
+  GAMBELA
+  HARARI
+  OROMIA
+  SIDAMA
+  SOMALI
+  SOUTH_ETHIOPIA
+  SOUTH_WEST_ETHIOPIA_PEOPLES
+  TIGRAY
+}
+
 enum Role {
+  REGIONAL_ADMIN
   SUPER_ADMIN
   HOSPITAL_ADMIN
   USER
@@ -23,6 +41,7 @@ enum HospitalType {
   PUBLIC
   PRIVATE
   GOVERNMENT
+  NGO
 }
 
 enum HospitalLevel {
@@ -32,18 +51,19 @@ enum HospitalLevel {
 }
 
 model User {
-  id         String    @id @default(uuid()) @map("_id")
-  name       String
-  email      String    @unique
-  password   String
+  id          String    @id @default(uuid()) @map("_id")
+  name        String
+  email       String    @unique
+  password    String
   phoneNumber String?   @map("phone_number")
-  isVerified Boolean   @default(false) @map("is_verified")
-  role       Role
-  hospitalId String?   @map("hospital_id")
-  hospital   Hospital? @relation(fields: [hospitalId], references: [id])
-  createdAt  DateTime  @default(now()) @map("created_at")
-  updatedAt  DateTime  @updatedAt @map("updated_at")
-  deletedAt  DateTime? @map("deleted_at") // For soft deletion
+  isVerified  Boolean   @default(false) @map("is_verified")
+  region      String? // Region where the user is located
+  role        Role
+  hospitalId  String?   @map("hospital_id")
+  hospital    Hospital? @relation(fields: [hospitalId], references: [id])
+  createdAt   DateTime  @default(now()) @map("created_at")
+  updatedAt   DateTime  @updatedAt @map("updated_at")
+  deletedAt   DateTime? @map("deleted_at") // For soft deletion
 }
 
 model Hospital {
@@ -56,10 +76,19 @@ model Hospital {
   longitude                 Float? // Longitude of the hospital's location
   type                      HospitalType // PUBLIC or PRIVATE
   level                     HospitalLevel // PRIMARY, GENERAL, or TERTIARY
-  bedCapacity               Int           @map("bed_capacity") // Total beds (including non-ICU)
-  icuBeds                   Int           @map("icu_beds") // Total ICU beds
-  availableIcuBeds          Int           @map("available_icu_beds") // Current available ICU beds
-  nonFunctionalBeds         Int           @map("non_functional_beds") // Beds that are not functional
+  bedCapacity               Int           @default(0) @map("bed_capacity") // Total beds (including non-ICU)
+  icuBeds                   Int           @default(0) @map("icu_beds") // Total ICU beds
+  availableIcuBeds          Int           @default(0) @map("available_icu_beds") // Current available ICU beds
+  nonFunctionalBeds         Int           @default(0) @map("non_functional_beds") // Beds that are not functional
+  // Breakdown of beds by type
+  general                   Int           @default(0) // General beds
+  medical                   Int           @default(0) // Medical beds 
+  surgical                  Int           @default(0) // Surgical beds
+  pediatrics                Int           @default(0) // Pediatrics beds
+  cardiac                   Int           @default(0) // Cardiac beds
+  maternal                  Int           @default(0) // Maternal beds
+  otherICU                  Int           @default(0) // Other ICU beds
+  // Services
   advancedAmbulanceServices Boolean       @map("advanced_ambulance_services") // Whether advanced ambulance services exist
   members                   User[] // Users linked to this hospital
   icuHistories              IcuHistory[] // Icu tracking history
