@@ -2,26 +2,24 @@
 
 import React, { useEffect, useState } from "react"
 import { notFound } from "next/navigation"
-import { MapPin } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
-import { Input } from "@/components/ui/input"
-import { Label } from "@/components/ui/label"
 import { useToast } from "@/hooks/use-toast" // Assuming you have a hook for toast notifications
-import { getHospital, getIcuHistory, updateHospital } from '@/utils/fakeBackend'
+import { getHospital, getIcuHistory } from '@/utils/fakeBackend'
 import { Hospital, IcuHistory } from "@/types"
 import { IcuHistoryGraph } from "@/components/IcuHistoryGraph"
 import { IcuHistoryTable } from '@/components/IcuHistoryTable'
 import { Toaster } from "@/components/ui/toaster"
 import { deleteHospital } from "@/utils/fakeBackend"
+import HospitalInfoUpdater from "../components/HospitalInfoUpdater"
+import { Spinner } from '@/components/ui/spinner';
 
 export default function HospitalPage({ params }: { params: { id: string } }) {
   const [hospital, setHospital] = useState<Hospital | null>(null)
   const [hospitalHistory, setHospitalHistory] = useState<IcuHistory[]>([])
-  const [isEditing, setIsEditing] = useState(false)
-  const [formData, setFormData] = useState<Hospital | null>(null)
+  // const [isEditing, setIsEditing] = useState(false)
   const { toast } = useToast()
 
   useEffect(() => {
@@ -33,18 +31,12 @@ export default function HospitalPage({ params }: { params: { id: string } }) {
       } else {
         setHospital(data)
         setHospitalHistory(historydata)
-        setFormData(data) // Initialize form data for editing
       }
     }
     fetchHospital()
   }, [params.id])
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (formData) {
-      const { name, value } = e.target
-      setFormData({ ...formData, [name]: value })
-    }
-  }
+
   const hadleDelete = async () => {
     try {
       await deleteHospital(params.id)
@@ -60,30 +52,10 @@ export default function HospitalPage({ params }: { params: { id: string } }) {
     }
   }
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    if (formData) {
-      try {
-        setIsEditing(false) // Exit edit mode
-        await updateHospital(params.id, formData)
-        setHospital(formData) // Update the displayed hospital info
-        toast({ title: "Hospital updated successfully!", description: "success", style: { backgroundColor: 'green', color: 'white' } })
-      } catch (error) {
-        console.log(error)
-        toast({
-          title: "Error",
-          description: "Failed to update Hospital. Please try again.",
-          style: { backgroundColor: 'red', color: 'white' }
 
-        })
-      } finally {
-        setIsEditing(false) // Exit edit mode
-      }
-    }
-  }
 
   if (!hospital) {
-    return <div>Loading...</div>
+    return <div className="flex h-screen justify-center items-center">      <Spinner />    </div>
   }
 
   return (
@@ -113,114 +85,8 @@ export default function HospitalPage({ params }: { params: { id: string } }) {
 
         </div>
         <div className="grid gap-6 md:grid-cols-2">
-          <Card>
-            <CardHeader>
-              <div className="flex justify-between items-start">
-                <div>
-                  <CardTitle className="text-2xl">{hospital.name}</CardTitle>
-                  <div className="flex gap-2 mt-2">
-                    <Badge variant={hospital.type === "PUBLIC" ? "default" : "secondary"}>
-                      {hospital.type}
-                    </Badge>
-                    <Badge variant="outline">{hospital.level}</Badge>
-                  </div>
-                </div>
-                <Button variant="outline" onClick={() => setIsEditing(true)}>Edit</Button>
-              </div>
-            </CardHeader>
-            <CardContent>
-              {isEditing ? (
-                <form onSubmit={handleSubmit} className="space-y-4">
-                  <div>
-                    <Label htmlFor="address">Address</Label>
-                    <Input
-                      id="address"
-                      name="address"
-                      value={formData?.address}
-                      onChange={handleInputChange}
-                      required
-                    />
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="region">Region</Label>
-                      <Input
-                        id="region"
-                        name="region"
-                        value={formData?.region || ""}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="zone">Zone</Label>
-                      <Input
-                        id="zone"
-                        name="zone"
-                        value={formData?.zone}
-                        onChange={handleInputChange}
-                      />
-                    </div>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <Label htmlFor="latitude">Latitude</Label>
-                      <Input
-                        id="latitude"
-                        name="latitude"
-                        type="number"
-                        value={formData ? parseFloat(formData.latitude.toString()) : 0}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                    <div>
-                      <Label htmlFor="longitude">Longitude</Label>
-                      <Input
-                        id="longitude"
-                        name="longitude"
-                        type="number"
-                        value={formData ? parseFloat(formData.longitude.toString()) : 0}
-                        onChange={handleInputChange}
-                        required
-                      />
-                    </div>
-                  </div>
-                  <div className="flex justify-end">
-                    <Button type="button" variant="secondary" onClick={() => setIsEditing(false)}>
-                      Cancel
-                    </Button>
-                    <Button type="submit">Save</Button>
-                  </div>
-                </form>
-              ) : (
-                <div className="space-y-4">
-                  <div className="flex items-center gap-2">
-                    <MapPin className="h-4 w-4" />
-                    <span className="truncate">{hospital.address}</span>
-                  </div>
-                  <div className="grid grid-cols-2 gap-4">
-                    <div>
-                      <p className="text-sm text-muted-foreground">Region</p>
-                      <p>{hospital.region}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Zone</p>
-                      <p>{hospital.zone}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Latitude</p>
-                      <p>{hospital.latitude}</p>
-                    </div>
-                    <div>
-                      <p className="text-sm text-muted-foreground">Longitude</p>
-                      <p>{hospital.longitude}</p>
-                    </div>
-                  </div>
-                </div>
-              )}
-            </CardContent>
-          </Card>
+
+          <HospitalInfoUpdater hospital={hospital} setHospital={setHospital} />
 
           <Card>
             <CardHeader>
@@ -246,7 +112,39 @@ export default function HospitalPage({ params }: { params: { id: string } }) {
                     <p className="text-2xl font-bold">{hospital.nonFunctionalBeds}</p>
                   </div>
                 </div>
-                <div className="pt-4 border-t">
+                <div className="pt-4 border-t mb-4">
+                  <div className="flex flex-wrap">
+
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">General Icu Beds</p>
+                      <p className="text-2xl font-bold">{hospital.general}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Medical Beds</p>
+                      <p className="text-2xl font-bold">{hospital.medical}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Surgical Beds</p>
+                      <p className="text-2xl font-bold">{hospital.surgical}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Pediatrics Beds</p>
+                      <p className="text-2xl font-bold">{hospital.pediatrics}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Cardiac Beds</p>
+                      <p className="text-2xl font-bold">{hospital.cardiac}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Maternal Beds</p>
+                      <p className="text-2xl font-bold">{hospital.maternal}</p>
+                    </div>
+                    <div className="border border-gray-200 p-1 rounded m-1">
+                      <p className="text-sm text-muted-foreground">Other ICU Beds</p>
+                      <p className="text-2xl font-bold">{hospital.otherICU}</p>
+                    </div>
+                  </div>
+
                   <div className="flex items-center gap-2">
                     <Badge variant={hospital.advancedAmbulanceServices ? "default" : "secondary"}>
                       {hospital.advancedAmbulanceServices ? "Available" : "Not Available"}
@@ -268,3 +166,4 @@ export default function HospitalPage({ params }: { params: { id: string } }) {
 
   )
 }
+

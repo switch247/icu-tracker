@@ -9,9 +9,10 @@ import { useToast } from "@/hooks/use-toast"
 import { useAuth } from '@/contexts/AuthContext'
 import { getHospital, updateIcuStatus, getIcuHistory } from '@/utils/fakeBackend'
 import { Hospital, IcuHistory } from '@/types'
-import { HospitalCard } from '@/components/HospitalCard'
+// import { HospitalCard } from '@/components/HospitalCard'
 import { IcuHistoryGraph } from '@/components/IcuHistoryGraph'
 import { IcuHistoryTable } from '@/components/IcuHistoryTable'
+import HospitalInfoUpdater from '../hospitals/components/HospitalInfoUpdater'
 
 
 export default function MyHospitalPage() {
@@ -24,6 +25,14 @@ export default function MyHospitalPage() {
     icuBeds: 0,
     availableIcuBeds: 0,
     nonFunctionalBeds: 0,
+    general: 0,
+    medical: 0,
+    surgical: 0,
+    pediatrics: 0,
+    cardiac: 0,
+    maternal: 0,
+    otherICU: 0,
+
   })
   const [isEditing, setIsEditing] = useState(false)
   const [loading, setLoading] = useState(false)
@@ -40,6 +49,13 @@ export default function MyHospitalPage() {
             icuBeds: hospitalData.icuBeds,
             availableIcuBeds: hospitalData.availableIcuBeds,
             nonFunctionalBeds: hospitalData.nonFunctionalBeds,
+            general: hospitalData.general,
+            medical: hospitalData.medical,
+            surgical: hospitalData.surgical,
+            pediatrics: hospitalData.pediatrics,
+            cardiac: hospitalData.cardiac,
+            maternal: hospitalData.maternal,
+            otherICU: hospitalData.otherICU,
           })
           const histories = await getIcuHistory(hospitalData.id)
           setIcuHistories(histories)
@@ -111,7 +127,7 @@ export default function MyHospitalPage() {
 
   return (
     <div className="container mx-auto py-8">
-      {hospital && HospitalCard(hospital)}
+      {hospital && <HospitalInfoUpdater hospital={hospital} setHospital={setHospital} />}
       <div className="flex justify-between items-center m-2">
         <h1 className="text-3xl font-bold">{hospital.name}</h1>
         <Button onClick={() => setIsEditing(!isEditing)}>
@@ -210,6 +226,166 @@ export default function MyHospitalPage() {
         </Card>
       </div>
 
+
+      {/* Additional fields */}
+      <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">General</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="general">General</Label>
+                <Input
+                  id="general"
+                  name="general"
+                  type="number"
+                  value={formData.general}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.general}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Medical</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="medical">Medical</Label>
+                <Input
+                  id="medical"
+                  name="medical"
+                  type="number"
+                  value={formData.medical}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.medical}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Surgical</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="surgical">Surgical</Label>
+                <Input
+                  id="surgical"
+                  name="surgical"
+                  type="number"
+                  value={formData.surgical}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.surgical}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Pediatrics</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="pediatrics">Pediatrics</Label>
+                <Input
+                  id="pediatrics"
+                  name="pediatrics"
+                  type="number"
+                  value={formData.pediatrics}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.pediatrics}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Cardiac</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="cardiac">Cardiac</Label>
+                <Input
+                  id="cardiac"
+                  name="cardiac"
+                  type="number"
+                  value={formData.cardiac}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.cardiac}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Maternal</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="maternal">Maternal</Label>
+                <Input
+                  id="maternal"
+                  name="maternal"
+                  type="number"
+                  value={formData.maternal}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.maternal}</div>
+            )}
+          </CardContent>
+        </Card>
+
+        <Card>
+          <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+            {!isEditing && <CardTitle className="text-sm font-medium">Other ICU</CardTitle>}
+          </CardHeader>
+          <CardContent>
+            {isEditing ? (
+              <div className="space-y-2">
+                <Label htmlFor="otherICU">Other ICU</Label>
+                <Input
+                  id="otherICU"
+                  name="otherICU"
+                  type="number"
+                  value={formData.otherICU}
+                  onChange={handleInputChange}
+                />
+              </div>
+            ) : (
+              <div className="text-2xl font-bold">{hospital.otherICU}</div>
+            )}
+          </CardContent>
+        </Card>
+      </div>
+
+
       {isEditing && (
         <div className="flex justify-end mt-4">
           {!loading ?
@@ -230,5 +406,6 @@ export default function MyHospitalPage() {
     </div>
   )
 }
+
 
 

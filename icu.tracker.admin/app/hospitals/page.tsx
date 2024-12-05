@@ -11,8 +11,10 @@ import { Hospital } from "@/types";
 import { HospitalCard } from "@/components/HospitalCard";
 import { CreateHospitalDialog } from "./CreateHospital";
 import { Progress } from "@/components/ui/progress"
+import { useAuth } from "@/contexts/AuthContext";
 
 export default function HospitalsPage() {
+  const { user } = useAuth();
   const [hospitals, setHospitals] = useState<Hospital[]>([]);
   const [filteredHospitals, setFilteredHospitals] = useState<Hospital[]>([]);
   const [regions, setRegions] = useState<string[]>([]);
@@ -34,7 +36,8 @@ export default function HospitalsPage() {
           clearInterval(interval);
         }
       }, 100);
-      const data = await getHospitals();
+
+      const data = await getHospitals( { params :{region: user?.region }});
 
       const uniqueRegions = Array.from(new Set(data.map((hospital) => hospital.region).filter(Boolean)));
       const uniqueZones = Array.from(new Set(data.map((hospital) => hospital.zone).filter(Boolean)));
@@ -84,7 +87,6 @@ export default function HospitalsPage() {
   }
 
   return (
-
 
     <div className="flex">
       <Sidebar onClearFilters={clearFilters}>

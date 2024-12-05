@@ -9,7 +9,7 @@ export default function HomePage() {
     <div className="container mx-auto py-8">
       <h1 className="text-4xl font-bold mb-8 text-center">Welcome to Icu Tracker System</h1>
       <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-        {user && (user.role == "SUPER_ADMIN") && (
+        {user && (user.role == "SUPER_ADMIN" || user.role == "REGIONAL_ADMIN") && (
           <>
           <Link href="/hospitals">
             <Card className="hover:shadow-lg transition-shadow">
@@ -36,7 +36,7 @@ export default function HomePage() {
         </>
 
         )}
-        {user && (user.role != "SUPER_ADMIN") && (<Link href="/my-hospital">
+        {user && (user.role == "HOSPITAL_ADMIN" || user.role == "USER") && (<Link href="/my-hospital">
           <Card className="hover:shadow-lg transition-shadow">
             <CardHeader>
               <CardTitle>My Hospital</CardTitle>

@@ -15,7 +15,10 @@ export function middleware(request: NextRequest) {
 
   if (user) {
     const userData = JSON.parse(user)
-    if (request.nextUrl.pathname === '/users' && userData.role !== 'SUPER_ADMIN') {
+    if (!userData.isVerified) {
+      return NextResponse.redirect(new URL('/auth/verify', request.url))
+    }
+    if (request.nextUrl.pathname === '/users' && (userData.role == 'USER' || userData.role == 'HOSPITAL_ADMIN')) {
       return NextResponse.redirect(new URL('/', request.url))
     }
     // && userData.role !== 'HOSPITAL_ADMIN'
@@ -28,6 +31,6 @@ export function middleware(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ['/my-hospital/:path*', '/profile', '/users', '/hospitals'],
+  matcher: ['/my-hospital/:path*', '/profile', '/users', '/hospitals', '/'],
 }
 

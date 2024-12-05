@@ -10,7 +10,7 @@ import { User } from "@/types"
 import { updateUser } from "@/utils/fakeBackend"
 import { Button } from "@/components/ui/button"
 import { Dialog, DialogContent, DialogFooter, DialogHeader, DialogTitle, DialogTrigger, DialogClose } from "@/components/ui/dialog"
-
+import { Spinner } from '@/components/ui/spinner';
 
 
 export default function UserPage({ params }: { params: { id: string } }) {
@@ -69,7 +69,8 @@ export default function UserPage({ params }: { params: { id: string } }) {
   }, [params.id])
 
   if (!user) {
-    return <div>Loading...</div>
+    return <div className="flex h-screen justify-center items-center">      <Spinner />    </div>
+
   }
 
   return (

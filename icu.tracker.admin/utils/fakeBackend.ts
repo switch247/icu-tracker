@@ -66,8 +66,9 @@ export const register = async (user: Omit<User, 'id'>): Promise<User | null> => 
 }
 
 // Data fetching functions
-export const getHospitals = async (): Promise<Hospital[]> => {
-  return await get('hospitals').then((response) => {
+export const getHospitals = async (config?: Record<string, any>): Promise<Hospital[]> => {
+  console.log(config)
+  return await get('hospitals', config).then((response) => {
     return response.data
   })
 }

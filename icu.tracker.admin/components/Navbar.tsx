@@ -17,10 +17,10 @@ export default function Navbar() {
           <div className="flex space-x-4">
             {user && (
               <>
-                {user.role === 'HOSPITAL_ADMIN' && (
+                {user.role === 'HOSPITAL_ADMIN' || user.role === 'USER' && (
                   <Link href="/my-hospital" className="hover:text-primary-foreground/80">My Hospital</Link>
                 )}
-                {user.role === 'SUPER_ADMIN' && (
+                {(user.role === 'SUPER_ADMIN' || user.role === 'REGIONAL_ADMIN' )&& (
                   <>
                     <Link href="/hospitals" className="hover:text-primary-foreground/80">Hospitals</Link>
                     <Link href="/users" className="hover:text-primary-foreground/80">Users</Link>

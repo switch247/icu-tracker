@@ -1,15 +1,26 @@
+"use client";
 import Link from "next/link"
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
 import { Badge } from "@/components/ui/badge"
 import { getUsers } from '@/utils/fakeBackend'
 import { User } from "@/types"
+import { CreateUserDialog } from "./CreateUser"
+import { useState, useEffect } from "react";
+export default function UsersPage() {
 
-export default async function UsersPage() {
-  const users = await getUsers()
+  const [users, setUsers] = useState<User[]>([])
+  useEffect(() => {
+    async function fetchUsers() {
+      const data = await getUsers()
+      setUsers(data)
+    }
+    fetchUsers()
+  }, [])
 
   return (
     <div className="container mx-auto py-8">
       <h1 className="text-3xl font-bold mb-8">Users</h1>
+      <CreateUserDialog />
       {/* <div className="grid gap-6 "> */}
       <div className="grid grid-cols-1 sm:grid-cols-1 lg:grid-cols-2 gap-6">
         {users.map((user) => (

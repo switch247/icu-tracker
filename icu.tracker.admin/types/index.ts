@@ -1,8 +1,10 @@
-export type UserRole = 'USER' | 'HOSPITAL_ADMIN' | 'SUPER_ADMIN'
+export type UserRole = 'USER' | 'HOSPITAL_ADMIN' | 'SUPER_ADMIN' | "REGIONAL_ADMIN"
 
 export type HospitalType = 'PUBLIC' | 'PRIVATE'
 
 export type HospitalLevel = 'PRIMARY' | 'SECONDARY' | 'TERTIARY'
+
+export type Region = 'ADDIS_ABABA' | 'AFAR' | 'AMHARA' | 'BENISHANGUL_GUMUZ' | 'CENTRAL_ETHIOPIA' | 'DIRE_DAWA' | 'GAMBELA' | 'HARARI' | 'OROMIA' | 'SIDAMA' | 'SOMALI' | 'SOUTH_ETHIOPIA' | 'SOUTH_WEST_ETHIOPIA_PEOPLES' | 'TIGRAY' | null
 
 export interface User {
   id: string
@@ -11,6 +13,7 @@ export interface User {
   isVerified: boolean
   email: string
   password?: string
+  region?: Region
   role: UserRole
   hospitalId?: string
   hospital?: Hospital
@@ -30,6 +33,14 @@ export interface Hospital {
   longitude: number
   availableIcuBeds: number
   nonFunctionalBeds: number
+  // types
+  general: number
+  medical: number
+  surgical: number
+  pediatrics: number
+  cardiac: number
+  maternal: number
+  otherICU: number
   advancedAmbulanceServices: boolean
 }
 
