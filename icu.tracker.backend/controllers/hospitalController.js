@@ -100,7 +100,8 @@ class HospitalController {
       res.status(400).json({ error: 'Failed to delete hospital.' });
     }
   }
-  // get hospital history
+
+  // Get hospital history
   async getHospitalHistory(req, res) {
     try {
       const { id } = req.params;
@@ -114,6 +115,29 @@ class HospitalController {
     } catch (error) {
       console.log(error);
       res.status(500).json({ error: 'Failed to fetch hospital history.' });
+    }
+  }
+
+  // Update all hospitals with a specific role
+  async updateHospitalRoles(req, res) {
+    try {
+      const { currentRole, newRole } = req.body;
+      if (!currentRole || !newRole) {
+        return res.status(400).json({ error: 'Current role and new role are required.' });
+      }
+
+      const updatedHospitals = await prisma.hospital.updateMany({
+        where: { role: currentRole },
+        data: { role: newRole },
+      });
+
+      res.status(200).json({
+        message: 'Hospital roles updated successfully.',
+        count: updatedHospitals.count,
+      });
+    } catch (error) {
+      console.log(error);
+      res.status(500).json({ error: 'Failed to update hospital roles.' });
     }
   }
 }

@@ -14,20 +14,20 @@ datasource db {
 }
 
 enum Region {
-  ADDIS_ABABA
+  TIGRAY
   AFAR
   AMHARA
-  BENISHANGUL_GUMUZ
-  CENTRAL_ETHIOPIA
+  OROMIA
+  ADDIS_ABABA
   DIRE_DAWA
+  BENISHANGUL_GUMUZ
   GAMBELA
   HARARI
-  OROMIA
-  SIDAMA
   SOMALI
-  SOUTH_ETHIOPIA
   SOUTH_WEST_ETHIOPIA_PEOPLES
-  TIGRAY
+  SIDAMA
+  CENTRAL_ETHIOPIA
+  SOUTH_ETHIOPIA
 }
 
 enum Role {
@@ -70,7 +70,7 @@ model Hospital {
   id                        String        @id @default(uuid()) @map("_id")
   name                      String
   address                   String
-  region                    String // Region where the hospital is located
+  region                    Region? // Region where the hospital is located
   zone                      String? // Zone where the hospital is located
   latitude                  Float? // Latitude of the hospital's location
   longitude                 Float? // Longitude of the hospital's location
