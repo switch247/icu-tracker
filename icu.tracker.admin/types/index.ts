@@ -4,7 +4,7 @@ export type HospitalType = 'PUBLIC' | 'PRIVATE'
 
 export type HospitalLevel = 'PRIMARY' | 'SECONDARY' | 'TERTIARY'
 
-export type Region = 'ADDIS_ABABA' | 'AFAR' | 'AMHARA' | 'BENISHANGUL_GUMUZ' | 'CENTRAL_ETHIOPIA' | 'DIRE_DAWA' | 'GAMBELA' | 'HARARI' | 'OROMIA' | 'SIDAMA' | 'SOMALI' | 'SOUTH_ETHIOPIA' | 'SOUTH_WEST_ETHIOPIA_PEOPLES' | 'TIGRAY' | null
+export type Region = 'ADDIS_ABABA' | 'AFAR' | 'AMHARA' | 'BENISHANGUL_GUMUZ' | 'CENTRAL_ETHIOPIA' | 'DIRE_DAWA' | 'GAMBELA' | 'HARARI' | 'OROMIA' | 'SIDAMA' | 'SOMALI' | 'SOUTH_ETHIOPIA' | 'SOUTH_WEST_ETHIOPIA_PEOPLES' | 'TIGRAY' | null | ''
 
 export interface User {
   id: string

@@ -67,10 +67,17 @@ export const register = async (user: Omit<User, 'id'>): Promise<User | null> => 
 
 // Data fetching functions
 export const getHospitals = async (config?: Record<string, any>): Promise<Hospital[]> => {
-  console.log(config)
-  return await get('hospitals', config).then((response) => {
+  // console.log(config?.params?.region)
+  const region_filter = config?.params?.region
+  const data = await get('hospitals', config).then((response) => {
     return response.data
   })
+  // console.log(region_filter == undefined)
+  if (region_filter == null || region_filter == undefined || region_filter == '') {
+    return data;
+  } else {
+    return data.filter((hospital: Hospital) => hospital.region === config?.params?.region)
+  }
 }
 
 export const getHospital = async (id: string): Promise<Hospital | null> => {
@@ -79,13 +86,21 @@ export const getHospital = async (id: string): Promise<Hospital | null> => {
   })
 }
 
-export const getUsers = async (): Promise<User[]> => {
-  return await get('users').then((response) => {
+export const getUsers = async (config?: Record<string, any>): Promise<User[]> => {
+
+  const data = await get('users', config).then((response) => {
     return response.map((user: User) => {
       const { password, ...userWithoutPassword } = user
       return userWithoutPassword
     })
   })
+  const region_filter = config?.params?.region
+
+  if (region_filter == null || region_filter == undefined || region_filter == '') {
+    return data;
+  } else {
+    return data.filter((user: User) => user.region === config?.params?.region)
+  }
 }
 
 export const getUser = async (id: string): Promise<User | null> => {
@@ -115,6 +130,9 @@ export const getMyHospital = async (userId: string): Promise<Hospital | null> =>
   return null
 }
 
+export const deleteUser = async (userId: string): Promise<unknown | null> => {
+  return await del(`users/${userId}`)
+}
 
 // TODO: Make this functional
 export const deleteHospital = async (hospitalId: string): Promise<unknown | null> => {

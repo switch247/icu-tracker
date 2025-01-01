@@ -9,7 +9,6 @@ import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle }
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
-// import { useAuth } from '@/contexts/AuthContext'
 import { register, getHospitals } from '@/utils/fakeBackend'
 import { Hospital, UserRole } from '@/types'
 
@@ -19,6 +18,7 @@ export default function RegisterPage() {
   const [password, setPassword] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [role, setRole] = useState<UserRole>('USER')
+  const [region, setRegion] = useState<string>('')
   const [hospitalId, setHospitalId] = useState<string | undefined>(undefined)
   const [error, setError] = useState('')
   const router = useRouter()
@@ -44,12 +44,12 @@ export default function RegisterPage() {
     try {
       setLoading(true)
       const user = await register({
-        name, email, password, role, hospitalId,phoneNumber,
+        name, email, password, role, hospitalId, phoneNumber,
         isVerified: false
       })
       if (user) {
         setLoading(false)
-        console.log(user)
+        // console.log(user)
         router.push('/auth/login')
       } else {
         setLoading(false)
@@ -121,6 +121,30 @@ export default function RegisterPage() {
                 <SelectContent>
                   <SelectItem value="USER">User</SelectItem>
                   <SelectItem value="HOSPITAL_ADMIN">Hospital Admin</SelectItem>
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Select value={region} onValueChange={(value) => setRegion(value)}>
+                <SelectTrigger>
+                  <SelectValue placeholder="Select role" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="AMHARA">Amhara</SelectItem>
+                  <SelectItem value="AFAR">Afar</SelectItem>
+                  <SelectItem value="BENISHANGUL_GUMUZ">Benishangul Gumuz</SelectItem>
+                  <SelectItem value="CENTRAL_ETHIOPIA">Central Ethiopia</SelectItem>
+                  <SelectItem value="DIRE_DAWA">Dire Dawa</SelectItem>
+                  <SelectItem value="GAMBELA">Gambela</SelectItem>
+                  <SelectItem value="HARARI">Harari</SelectItem>
+                  <SelectItem value="OROMIA">Oromia</SelectItem>
+                  <SelectItem value="SIDAMA">Sidama</SelectItem>
+                  <SelectItem value="SOMALI">Somali</SelectItem>
+                  <SelectItem value="SOUTH_ETHIOPIA">South Ethiopia</SelectItem>
+                  <SelectItem value="SOUTH_WEST_ETHIOPIA_PEOPLES">South West Ethiopia Peoples</SelectItem>
+                  <SelectItem value="TIGRAY">Tigray</SelectItem>
                 </SelectContent>
               </Select>
             </div>

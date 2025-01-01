@@ -37,7 +37,7 @@ export default function HospitalsPage() {
         }
       }, 100);
 
-      const data = await getHospitals( { params :{region: user?.region }});
+      const data = await getHospitals({ params: { region: user?.region } });
 
       const uniqueRegions = Array.from(new Set(data.map((hospital) => hospital.region).filter(Boolean)));
       const uniqueZones = Array.from(new Set(data.map((hospital) => hospital.zone).filter(Boolean)));
@@ -85,6 +85,8 @@ export default function HospitalsPage() {
       </div>
     );
   }
+  
+  if (!user) return;
 
   return (
 
@@ -118,7 +120,7 @@ export default function HospitalsPage() {
         <br />
         <CheckboxFilter
           label="Type"
-          options={["PUBLIC", "PRIVATE"]}
+          options={["PRIVATE", "GOVERNMENT", "PUBLIC"]}
           selected={selectedTypes}
           onChange={setSelectedTypes}
         />

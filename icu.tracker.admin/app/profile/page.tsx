@@ -15,6 +15,7 @@ export default function ProfilePage() {
   const [phoneNumber, setPhoneNumber] = useState('')
   const [email, setEmail] = useState('')
   const [role, setRole] = useState('')
+  const [region, setRegion] = useState('')
   const [hospital, setHospital] = useState('')
   const [loading, setLoading] = useState(false)
   const { toast } = useToast()
@@ -24,6 +25,7 @@ export default function ProfilePage() {
       setName(user.name)
       setEmail(user.email)
       setRole(user.role)
+      setRegion(user.region || '')
       setPhoneNumber(user.phoneNumber)
       setHospital(user.hospitalId || '')
     }
@@ -34,7 +36,7 @@ export default function ProfilePage() {
     if (user) {
       try {
         setLoading(true)
-        console.log("user:", user.id)
+        // console.log("user:", user.id)
         const updatedUser = await updateProfile(user.id, { name, phoneNumber }) as unknown as { data: any }
         login(updatedUser.data, Cookies.get('token')!)
         toast({
@@ -95,10 +97,14 @@ export default function ProfilePage() {
               <Label htmlFor="role">Role</Label>
               <Input id="role" value={role} readOnly />
             </div>
+            <div className="space-y-2">
+              <Label htmlFor="region">Region</Label>
+              <Input id="region" value={region} readOnly disabled />
+            </div>
             {hospital && (
               <div className="space-y-2">
                 <Label htmlFor="hospital">Hospital ID</Label>
-                <Input id="hospital" value={hospital} readOnly />
+                <Input id="hospital" value={hospital} readOnly disabled />
               </div>
             )}
             <div className="flex justify-end">
