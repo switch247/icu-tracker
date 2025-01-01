@@ -1,6 +1,6 @@
-"use client";
+'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, use } from 'react';
 import {
   MapContainer,
   TileLayer,
@@ -11,19 +11,21 @@ import {
   GeoJSON,
 } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
-import "leaflet-defaulticon-compatibility"
-import "leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.css"
-
+import 'leaflet/dist/leaflet.css';
 import L from 'leaflet';
+import { FaBars } from 'react-icons/fa';
 import regionsGeoJson from './regionsGeoJson.json';
 import zonesGeoJson from './zonesGeoJson.json';
 import regionToZone from './region_to_zone.json';
+import HospitalCard from './HospitalCard';
+import Spinner from './Spinner';
+
 // Custom hospital icon (House-like, properly styled)
 const hospitalIcon = new L.Icon({
-  iconUrl: 'https://cdn-icons-png.flaticon.com/512/1046/1046869.png', // Icon URL
-  iconSize: [50, 50], // Marker size
+  iconUrl: '/Hospiatl.webp', // Icon URL
+  iconSize: [60, 50], // Marker size
   iconAnchor: [25, 50], // Anchor to center-bottom
-  popupAnchor: [0, -50], // Popup offset
+  popupAnchor: [0, -70], // Popup offset
   shadowUrl: null, // No shadow
   shadowSize: null,
   shadowAnchor: null,
@@ -56,18 +58,68 @@ const EthiopiaHospitalsMap = () => {
   const [hospitals, setHospitals] = useState([]);
   const [filteredHospitals, setFilteredHospitals] = useState([]);
   const [searchQuery, setSearchQuery] = useState('');
+  const [selectedRegion, setSelectedRegion] = useState('All Regions');
   const [error, setError] = useState(null);
   const [geoJsonData, setGeoJsonData] = useState(null);
+  const [showMenu, setShowMenu] = useState(false);
   const [zoneGeoJsonData, setZoneGeoJsonData] = useState(null);
-  const [selectedRegion, setSelectedRegion] = useState(null);
-  const [isMounted, setIsMounted] = React.useState(false);
+
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    var reg = selectedRegion;
+    if (selectedRegion == 'All Regions') {
+      setFilteredHospitals(hospitals);
+      return;
+    }
+    else if (selectedRegion == 'Benishangul-Gumuz') {
+      reg = 'BENISHANGUL_GUMUZ';
+    } else if (selectedRegion == 'Addis Ababa') {
+      reg = 'ADDIS_ABABA';
+    } else if (selectedRegion == 'Tigray') {
+      reg = 'TIGRAY';
+    } else if (selectedRegion == 'Somali') {
+      reg = 'SOMALI';
+    } else if (selectedRegion == 'Afar') {
+      reg = 'AFAR';
+    } else if (selectedRegion == 'Amhara') {
+      reg = 'AMHARA';
+    } else if (selectedRegion == 'Oromia') {
+      reg = 'OROMIA';
+    } else if (selectedRegion == 'Gambela') {
+      reg = 'GAMBELA';
+    } else if (selectedRegion == 'Dire Dawa') {
+      reg = 'DIRE_DAWA';
+    } else if (selectedRegion == 'Hareri') {
+      reg = 'HARARI';
+    } else if (selectedRegion == 'SNNPR') {
+      reg = [
+        'SOUTH_WEST_ETHIOPIA_PEOPLES',
+        'SIDAMA',
+        'CENTRAL_ETHIOPIA',
+        'SOUTH_ETHIOPIA',
+      ];
+    } else {
+      reg = selectedRegion;
+    }
+
+    var regionBasedFilteredHospitals = hospitals.filter((hospital) =>
+      Array.isArray(reg)
+        ? reg.includes(hospital.region.toUpperCase())
+        : hospital.region.toUpperCase() === reg.toUpperCase()
+    );
+
+    setFilteredHospitals(regionBasedFilteredHospitals);
+    
+  }, [ selectedRegion, hospitals]);
+
   const onEachFeature = (feature, layer) => {
     layer.on({
       click: () => {
         // Get the region name from the clicked feature
         var regionName = feature.properties.REGIONNAME;
-        if (regionName== "Beneshangul Gumu"){
-            regionName = "Benishangul-Gumuz"
+        if (regionName == 'Beneshangul Gumu') {
+          regionName = 'Benishangul-Gumuz';
         }
         // Get the zones that belong to the selected region
         const zonesInRegion = regionToZone.zones
@@ -79,23 +131,21 @@ const EthiopiaHospitalsMap = () => {
           zonesInRegion.includes(zone.properties.ZONENAME)
         );
 
-         // Clear the state before setting it again to force re-render
-         setZoneGeoJsonData(null);
-         setTimeout(() => {
-           setZoneGeoJsonData({
-             type: 'FeatureCollection',
-             features: filteredZones,
-           });
-         }, 0);
- 
-         setSelectedRegion(regionName);
-         console.log('filteredZones:', filteredZones);
+        // Clear the state before setting it again to force re-render
+        setZoneGeoJsonData(null);
+        setTimeout(() => {
+          setZoneGeoJsonData({
+            type: 'FeatureCollection',
+            features: filteredZones,
+          });
+        }, 0);
 
+        setSelectedRegion(regionName);
+        console.log('filteredZones:', filteredZones);
       },
     });
     // Bind Tooltip to each region
     layer.bindTooltip(feature.properties.REGIONNAME, {
-      permanent: true,
       direction: 'top',
       offset:
         feature.properties.REGIONNAME == 'Addis Ababa' ? [0, 20] : [0, -20],
@@ -106,17 +156,17 @@ const EthiopiaHospitalsMap = () => {
     layer.bindPopup(
       `<div>
           <strong>${feature.properties.REGIONNAME}</strong>
-          <br />
-          <strong>Area:</strong> ${feature.properties.AREA} km²
-          <br />
-          <strong>Population:</strong> ${feature.properties.POPULATION}
         </div>`
     );
   };
+
   useEffect(() => {
-    setIsMounted(true);
+    // Ensure this code runs only on the client side
+    if (typeof window !== 'undefined') {
+      // Load your GeoJSON data here
       setGeoJsonData(regionsGeoJson);
-     
+      //   setZoneGeoJsonData(zonesGeoJson);
+    }
   }, []);
 
   // Fetch hospitals data from the backend API
@@ -126,17 +176,23 @@ const EthiopiaHospitalsMap = () => {
         const response = await fetch(
           `${process.env.NEXT_PUBLIC_BASE_URL}/api/hospitals`
         );
-        console.log(response, 'response');
+        // console.log(response, 'response');
         if (!response.ok) {
           throw new Error(`HTTP error! status: ${response.status}`);
         }
 
         const data = await response.json();
+        // console.log('Fetched Hospitals:', data.data);
         setHospitals(data.data || []);
         setFilteredHospitals(data.data || []);
+        setLoading(false);
       } catch (error) {
+        setLoading(false);
+
         console.error('Error fetching hospitals:', error);
         setError(error.message);
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -154,17 +210,38 @@ const EthiopiaHospitalsMap = () => {
     );
     setFilteredHospitals(filtered);
   };
-  useEffect (() => {
   // Ensure the map is only rendered on the client side
   if (typeof window === 'undefined') {
     return null;
   }
-  },[]);
 
   return (
     <div style={{ display: 'flex', height: '100vh', overflow: 'hidden' }}>
-      {leftSideHospitals(filteredHospitals)}
-
+      {/* Hamburger Menu */}
+      <div className="hamburger-menu">
+        <FaBars
+          size={24}
+          style={{ cursor: 'pointer', margin: '10px' }}
+          onClick={() => setShowMenu(!showMenu)}
+        />
+        {showMenu && (
+          <div className="menu-content" style={{ position: 'absolute', zIndex: 1000, backgroundColor: '#fff', padding: '10px', width: '250px' }}>
+            {!loading ? (
+              leftSideHospitals({
+                filteredHospitals,
+                resetFilter: () => {
+                  setSearchQuery('');
+                  setSelectedRegion('All Regions');
+                },
+              })
+            ) : (
+              <div style={{ flex: 2, overflowY: 'auto', padding: '10px' }}>
+                <Spinner />
+              </div>
+            )}
+          </div>
+        )}
+      </div>
       <div
         style={{
           flex: 8,
@@ -174,7 +251,8 @@ const EthiopiaHospitalsMap = () => {
         }}
       >
         {/* Search Bar */}
-        {SearchBar(searchQuery, handleSearch)}
+        {SearchBar({ searchQuery, handleSearch: handleSearch, selectedRegion, setSelectedRegion })}
+
 
         {error ? (
           <div
@@ -188,13 +266,14 @@ const EthiopiaHospitalsMap = () => {
           >
             <strong>Error:</strong> {error}
           </div>
-        ) : isMounted? (
+        ) : (
           <MapContainer
             center={[9.03, 38.74]}
             zoom={6.2}
             minZoom={6}
             maxZoom={15}
             style={{ height: '100%', width: '100%' }}
+            attributionControl={false}
           >
             <TileLayer
               attribution='&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
@@ -217,7 +296,6 @@ const EthiopiaHospitalsMap = () => {
                         {hospital.name}
                       </span>
                     </Tooltip>
-
                     <Popup>
                       <div style={{ fontSize: '14px', lineHeight: '1.5' }}>
                         <strong
@@ -226,24 +304,52 @@ const EthiopiaHospitalsMap = () => {
                             fontSize: '16px',
                           }}
                         >
-                          {hospital.name}
+                          {hospital.name}{' '}
+                          <div>
+                            ({' '}
+                            {hospital.type === 'PRIVATE'
+                              ? 'P'
+                              : hospital.type === 'GOVERNMENT'
+                                ? 'G'
+                                : 'NG'}
+                            )
+                          </div>
                         </strong>
-                        <br />
-                        <strong>Type:</strong>{' '}
-                        {hospital.type === 'PRIVATE'
-                          ? 'Private'
-                          : hospital.type === 'GOVERNMENT'
-                          ? 'Government'
-                          : 'NGO'}
-                        <br />
                         <strong>Total ICUs:</strong> {hospital.icuBeds}
+                        <br />
+                        <strong>Available ICU Beds:</strong> {hospital.availableIcuBeds}
+                        <br />
+                        <strong>Non-Functional Beds:</strong> {hospital.nonFunctionalBeds}
                         <br />
                         <strong>Bed Capacity:</strong> {hospital.bedCapacity}
                         <br />
+
+                        {/* Render only the ICU categories with non-zero values */}
+                        <div>
+                          {Object.entries({
+                            General: hospital.general,
+                            Medical: hospital.medical,
+                            Surgical: hospital.surgical,
+                            Pediatrics: hospital.pediatrics,
+                            Cardiac: hospital.cardiac,
+                            Maternal: hospital.maternal,
+                            OtherICU: hospital.otherICU,
+                          })
+                            .filter(([key, value]) => value > 0) // Filter out keys with a value of 0
+                            .map(([key, value]) => (
+                              <div key={key}>
+                                <strong>{key}:</strong> {value}
+                              </div>
+                            ))}
+                        </div>
+
                         <strong>Last Updated:</strong>{' '}
                         {new Date(hospital.updatedAt).toLocaleString()}
+                        <br />
+                        <strong>Contact Person:</strong>
                       </div>
                     </Popup>
+
                   </Marker>
                 )
             )}
@@ -276,7 +382,7 @@ const EthiopiaHospitalsMap = () => {
               />
             )}
           </MapContainer>
-        ): null}
+        )}
 
         {/* Legend Footer */}
         {LegendFooter()}
@@ -291,7 +397,7 @@ function LegendFooter() {
   return (
     <div
       style={{
-        zIndex: 1000,
+        zIndex: 90,
         position: 'absolute',
         bottom: 10,
         left: '50%',
@@ -303,11 +409,14 @@ function LegendFooter() {
       }}
     >
       <strong>Legend:</strong> P = Private, G = Government, NG = NGO
+      <br />
+      <strong>NB:</strong> The Hospital and the Contact person indicated for
+      each hospital are entirely responsible for the information provided here
     </div>
   );
 }
 
-function SearchBar(searchQuery, handleSearch) {
+function SearchBar({ searchQuery, handleSearch, selectedRegion, setSelectedRegion }) {
   return (
     <div
       style={{
@@ -320,6 +429,7 @@ function SearchBar(searchQuery, handleSearch) {
         maxWidth: '400px',
       }}
     >
+      {/* Search Input */}
       <input
         type="text"
         value={searchQuery}
@@ -330,23 +440,44 @@ function SearchBar(searchQuery, handleSearch) {
           padding: '10px',
           border: '1px solid #ccc',
           borderRadius: '5px',
-          fontSize: '16px',
+          marginBottom: '10px',
         }}
       />
+
+      {/* Region Dropdown */}
+      <select
+        value={selectedRegion}
+        onChange={(e) => setSelectedRegion(e.target.value)}
+        style={{
+          width: '100%',
+          padding: '10px',
+          border: '1px solid #ccc',
+          borderRadius: '5px',
+        }}
+      >
+        <option value="All Regions">All Regions</option>
+        {Object.keys(regionColors).map((region) => (
+          <option key={region} value={region}>
+            {region}
+          </option>
+        ))}
+      </select>
     </div>
   );
 }
 
-function leftSideHospitals(filteredHospitals) {
+function leftSideHospitals({ filteredHospitals, resetFilter }) {
   return (
-    <div style={{ flex: 2, overflowY: 'auto', padding: '10px' }}>
-      <span>
+    <div style={{ flex: 2, overflowY: 'auto', padding: '10px', zIndex: 100 }}>
+      <span
+        style={{
+          display: 'flex',
+          justifyContent: 'space-between',
+          alignItems: 'center',
+        }}
+      >
         <strong>Showing {filteredHospitals.length} hospitals</strong>
-      </span>
-
-      {filteredHospitals.map((hospital) => (
-        <div
-          key={hospital.id}
+        <button
           style={{
             border: '1px solid #ccc',
             borderRadius: '5px',
@@ -354,28 +485,14 @@ function leftSideHospitals(filteredHospitals) {
             marginBottom: '10px',
             backgroundColor: '#f9f9f9',
           }}
+          onClick={() => resetFilter()}
         >
-          <h3 style={{ margin: '0 0 10px 0' }}>{hospital.name}</h3>
-          <p style={{ margin: '0' }}>
-            <strong>Type:</strong>{' '}
-            {hospital.type === 'PRIVATE'
-              ? 'Private'
-              : hospital.type === 'GOVERNMENT'
-              ? 'Government'
-              : 'NGO'}
-          </p>
-          <p style={{ margin: '0' }}>
-            <strong>Total ICUs:</strong> {hospital.icuBeds}
-          </p>
-          <p style={{ margin: '0' }}>
-            <strong>Bed Capacity:</strong> {hospital.bedCapacity}
-          </p>
-          <p style={{ margin: '0' }}>
-            <strong>Last Updated:</strong>{' '}
-            {new Date(hospital.updatedAt).toLocaleString()}
-          </p>
-        </div>
-      ))}
+          Clear
+        </button>
+      </span>
+
+      {filteredHospitals.map((hospital) => <HospitalCard key={hospital.id} hospital={hospital} />)}
     </div>
   );
 }
+
